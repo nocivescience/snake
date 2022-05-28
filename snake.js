@@ -17,7 +17,8 @@ const directionMap={
 }
 let state={
     canvas:null,
-    snake:null,
+    context:null,
+    snake:[{x:0,y:0}],
     direction:{x:1,y:0},
     prey: {x:0,y:0},
     growing:0,
@@ -115,4 +116,5 @@ window.onload=function(){
             }
         }
     }
+    tick();
 };
