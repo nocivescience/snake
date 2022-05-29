@@ -1,6 +1,4 @@
 const stateRunning=1;
-const boardWidth=50;
-const boardHeight=50;
 const stateLosing=2;
 const TICK=80;
 const squareSize=20;
@@ -26,8 +24,8 @@ let state={
 }
 function randomXY(){
     return {
-        x:Math.floor(Math.random()*boardWidth),
-        y:Math.floor(Math.random()*boardHeight)
+        x:parseInt(Math.floor(Math.random()*state.canvas.width)),
+        y:parseInt(Math.floor(Math.random()*state.canvas.height))
     }
 };
 function tick(){
@@ -57,7 +55,7 @@ function tick(){
         interval=10;
         if(state.snake.length>0){state.snake.splice(0,1)};
         if(state.snake.length===0){
-            state.runState=stateLosing;
+            state.runState=stateRunning;
             state.snake.push(randomXY());
             state.prey=randomXY();
         }
@@ -79,7 +77,7 @@ function tick(){
 }
 function detectCollision(){
     const head=state.snake[0];
-    if(head.x<0||head.x>=boardWidth||head.y<0||head.y>=boardHeight){
+    if(head.x<0||head.x>=state.canvas.width||head.y<0||head.y>=state.canvas.height){
         return true;
     }
     for(let idx=1;idx<state.snake.length;idx++){
@@ -91,11 +89,11 @@ function detectCollision(){
     return false;
 }
 function drawPixel(color,x,y){
-    state.ctx.fillStyle=color;
-    state.ctx.fillRect(x*squareSize,y*squareSize,squareSize,squareSize);
+    state.context.fillStyle=color;
+    state.context.fillRect(x*squareSize,y*squareSize,squareSize,squareSize);
 }
 function draw(){
-    state.ctx.clearRect(0,0,state.canvas.width,state.canvas.height);
+    state.context.clearRect(0,0,state.canvas.width,state.canvas.height);
     for(let idx=0;idx<state.snake.length;idx++){
         const {x,y}=state.snake[idx];
         drawPixel('red',x,y);
@@ -103,9 +101,11 @@ function draw(){
     const {x,y}=state.prey;
     drawPixel('yellow',x,y);
 }
+state.canvas=document.getElementById('games');
+state.context=state.canvas.getContext('2d');
+state.context.width=window.innerWidth;
+state.context.height=window.innerHeight;
 window.onload=function(){
-    state.canvas=document.getElementById('games');
-    state.ctx=state.canvas.getContext('2d');
     window.onkeydown=function(e){
         const direction = directionMap[e.key];
         if(direction){
