@@ -27,8 +27,8 @@ function randomXY(){
         x:parseInt(Math.floor(Math.random()*state.canvas.width)),
         y:parseInt(Math.floor(Math.random()*state.canvas.height))
     }
-};
-function tick(){
+}
+function ticking(){
     const head=state.snake[0];
     const dx=state.direction.x;
     const dy=state.direction.y;
@@ -37,84 +37,65 @@ function tick(){
     let interval=TICK;
     Object.assign(tail,state.snake[state.snake.length-1]);
     let didScore=(
-        head.x===state.prey.x &&
-        head.y===state.prey.y
+        head.x==state.prey.x &&
+        head.y==state.prey.y
     );
-    if(state.runState=stateRunning){
+    if(state.runState===stateRunning){
         for(let idx=heighestIndex;idx>-1;idx--){
-            const sq =state.snake[idx];
+            const sq=state.snake[idx];
             if(idx===0){
                 sq.x+=dx;
                 sq.y+=dy;
             }else{
+                // Object.assign(sq,tail);
+                // sq.x=tail.x;
+                // sq.y=tail.y;
                 sq.x=state.snake[idx-1].x;
                 sq.y=state.snake[idx-1].y;
             }
         }
-    }else if(state.runState===stateLosing){
-        interval=10;
-        if(state.snake.length>0){state.snake.splice(0,1)};
-        if(state.snake.length===0){
-            state.runState=stateRunning;
-            state.snake.push(randomXY());
-            state.prey=randomXY();
-        }
-    }
-    if(detectCollision()){
-        state.runState=stateLosing;
-        state.growing=0;
     }
     if(didScore){
         state.growing+=growScale;
         state.prey=randomXY();
     }
-    if(state.growing>0){
-        state.snake.push(tail);
-        state.growing--;
-    }
     requestAnimationFrame(draw);
-    setTimeout(tick,interval);
-}
-function detectCollision(){
-    const head=state.snake[0];
-    if(head.x<0||head.x>=state.canvas.width||head.y<0||head.y>=state.canvas.height){
-        return true;
-    }
-    for(let idx=1;idx<state.snake.length;idx++){
-        const sq=state.snake[idx];
-        if(sq.x===head.x&&sq.y===head.y){
-            return true;
-        }
-    }
-    return false;
+    setTimeout(ticking,interval);
 }
 function drawPixel(color,x,y){
     state.context.fillStyle=color;
-    state.context.fillRect(x*squareSize,y*squareSize,squareSize,squareSize);
+    state.context.fillRect(x,y,50,50);
+    state.context.fill();
 }
 function draw(){
-    state.context.clearRect(0,0,state.canvas.width,state.canvas.height);
+    state.context.clearRect(0,0,600,400);
     for(let idx=0;idx<state.snake.length;idx++){
         const {x,y}=state.snake[idx];
         drawPixel('red',x,y);
     }
     const {x,y}=state.prey;
-    drawPixel('yellow',x,y);
+    drawPixel('red',x,y);
+    drawPixel('yellow',400,400);
 }
-state.canvas=document.getElementById('games');
-state.context=state.canvas.getContext('2d');
-state.context.width=window.innerWidth;
-state.context.height=window.innerHeight;
 window.onload=function(){
+    state.canvas=document.getElementById('games');
+    state.context=state.canvas.getContext('2d');
+    state.canvas.width=window.innerWidth;
+    state.canvas.height=window.innerHeight;
     window.onkeydown=function(e){
-        const direction = directionMap[e.key];
+        const direction=directionMap[e.key];
+        const [x,y]=direction;
+        console.log(x,y);
         if(direction){
             const [x,y]=direction;
-            if(-x !==state.direction.x && -y !==state.direction.y){
+            if(
+                x!=state.direction.x ||
+                y!=state.direction.y
+            ){
                 state.direction.x=x;
                 state.direction.y=y;
             }
         }
     }
-    tick();
-};
+    ticking();
+}
