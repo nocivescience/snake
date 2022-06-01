@@ -3,7 +3,7 @@ body{
     font-family: 'VT323', monospace;
 }
 canvas{
-    width: 600px;
-    height: 400px;
-    box-shadow: 0px 0px 10px black;   
+    box-shadow: 0px 0px 10px black;  
+    width: 600px; 
+    height: 600px;
 }

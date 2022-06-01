@@ -62,20 +62,40 @@ function ticking(){
     requestAnimationFrame(draw);
     setTimeout(ticking,interval);
 }
+function detectCollision(){
+    const head=state.snake[0];
+    if(
+        head.x<0 ||
+        head.x>=state.canvas.width ||
+        head.y<0 ||
+        head.y>=state.canvas.height
+    ){
+        return true;
+    }
+    for(let idx=1;idx<state.snake.length;idx++){
+        const sq=state.snake[idx];
+        if(
+            sq.x==head.x &&
+            sq.y==head.y
+        ){
+            return true;
+        }
+    };
+    return false;
+}
 function drawPixel(color,x,y){
     state.context.fillStyle=color;
-    state.context.fillRect(x,y,50,50);
+    state.context.fillRect(50*x,50*y,50,50);
     state.context.fill();
 }
 function draw(){
-    state.context.clearRect(0,0,600,400);
+    state.context.clearRect(0,0,state.canvas.width,state.canvas.height);
     for(let idx=0;idx<state.snake.length;idx++){
         const {x,y}=state.snake[idx];
         drawPixel('red',x,y);
     }
     const {x,y}=state.prey;
-    drawPixel('red',x,y);
-    drawPixel('yellow',400,400);
+    drawPixel('yellow',x/100,y/100);
 }
 window.onload=function(){
     state.canvas=document.getElementById('games');
@@ -85,7 +105,6 @@ window.onload=function(){
     window.onkeydown=function(e){
         const direction=directionMap[e.key];
         const [x,y]=direction;
-        console.log(x,y);
         if(direction){
             const [x,y]=direction;
             if(
