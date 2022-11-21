@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../../navBar/navbar.css">
+    <script defer src="../../navBar/navbar.js"></script>
+    <title>Document</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: url('./imagen.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        
+      }
+      h1 {
+        color: blanchedalmond;
+        text-align: center;
+        font-size: 22px;
+        font-family: 'Press Start 2P', cursive;
+      }
+      #canvas {
+        background-color: rgba(60, 249, 255, 0.582);
+        box-shadow: black 2px 3px 4px;
+        border-radius: 10px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body">
+    <header>
+      <nav class="nav">
+          <img class="image" src="../../navBar/imageProfile.jpg" alt="">
+        <button class="nav-toggle" aria-label="Abrir menú">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-justify" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+          </svg>
+        </button>
+        <ul class="nav-menu">
+          <li class="nav-menu-item">
+            <a href="../../index.html" class="nav-menu-link nav-link">Home</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href=".././games.html" class="nav-menu-link nav-link">Games</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="../../mathVideos/mathVideos.html" class="nav-menu-link nav-link">Math</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="../../chemistry/chemistry.html" class="nav-menu-link nav-link">Chemistry</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="#" class="nav-menu-link nav-link">Physics</a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="#" class="nav-menu-link nav-link nav-menu-link_active">Contacto</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="container" style=>
+      <h1>
+        Rescue to GinGin
+        <span>🙇‍♀️</span>
+      </h1>
+      <canvas id="canvas" width="500px" height="400px"></canvas>
+    </div>
+    <script>
+      const stateRunning = 1
+      const stateLosing = 2
+      const TICK = 80
+      const squareSize = 10
+      const boardWidth = 50
+      const boardHeight = 40
+      const growScale = 10
+      const canvas = document.getElementById('canvas')
+      const ctx = canvas.getContext('2d')
+      let score = 0
+      const direction_map = {
+        A: [-1, 0],
+        D: [1, 0],
+        S: [0, 1],
+        W: [0, -1],
+        a: [-1, 0],
+        d: [1, 0],
+        s: [0, 1],
+        w: [0, -1],
+      }
+      let state = {
+        canvas: null,
+        context: null,
+        snake: [{ x: 0, y: 0 }], //sacar parentesis
+        direction: { x: 1, y: 0 }, //sacar parentesis
+        prey: { x: 0, y: 0 },
+        growing: 0,
+        runState: stateRunning,
+      }
+
+      function randomXY() {
+        return {
+          x: parseInt(Math.random() * boardWidth),
+          y: parseInt(Math.random() * boardHeight),
+        }
+      }
+      function tick() {
+        const head = state.snake[0]
+        const dx = state.direction.x
+        const dy = state.direction.y
+        const highestIndex = state.snake.length - 1
+        let tail = {}
+        let interval = TICK
+        Object.assign(tail, state.snake[state.snake.length - 1])
+        let didScore = head.x === state.prey.x && head.y === state.prey.y
+        if (state.runState === stateRunning) {
+          for (let idx = highestIndex; idx > -1; idx--) {
+            const sq = state.snake[idx]
+            if (idx === 0) {
+              sq.x += dx
+              sq.y += dy
+            } else {
+              sq.x = state.snake[idx - 1].x
+              sq.y = state.snake[idx - 1].y
+            }
+          }
+        } else if (state.runState === stateLosing) {
+          //aca puse state.statelosing
+          interval = 10
+          if (state.snake.length > 0) {
+            state.snake.splice(0, 1)
+          }
+          if (state.snake.length === 0) {
+            state.runState = stateRunning
+            state.snake.push(randomXY())
+            state.prey = randomXY()
+          }
+        }
+        if (detectCollision()) {
+          //aca solo puso detectCollision
+          state.runState = stateLosing
+          state.growing = 0
+          score = 0
+        }
+        if (didScore) {
+          state.growing += growScale
+          score++
+          state.prey = randomXY()
+        }
+        if (state.growing > 0) {
+          state.snake.push(tail)
+          state.growing -= 1
+        }
+        requestAnimationFrame(draw)
+        setTimeout(tick, interval) //poner TICK
+      }
+      function detectCollision() {
+        const head = state.snake[0]
+        if (
+          head.x < 0 ||
+          head.x >= boardWidth ||
+          head.y >= boardHeight ||
+          head.y < 0
+        ) {
+          return true
+        }
+        for (var idx = 1; idx < state.snake.length; idx++) {
+          const sq = state.snake[idx]
+          if (sq.x === head.x && sq.y === head.y) {
+            return true
+          }
+        }
+        return false
+      }
+      function drawPixel(color, x, y) {
+        state.context.fillStyle = color
+        state.context.strokeRect(
+          x * squareSize,
+          y * squareSize,
+          squareSize,
+          squareSize,
+        )
+        state.context.fillRect(
+          x * squareSize,
+          y * squareSize,
+          squareSize,
+          squareSize,
+        )
+        state.context.fillStyle = 'rgba(0, 0, 0, .4'
+      }
+      function drawScore() {
+        ctx.font = '30px VT323'
+        ctx.fillText(`Score: ${score}`, canvas.width - 300, 30)
+      }
+      function draw() {
+        state.context.clearRect(0, 0, 500, 500)
+        for (var idx = 0; idx < state.snake.length; idx++) {
+          const { x, y } = state.snake[idx]
+          drawPixel('red', x, y)
+        }
+        const { x, y } = state.prey
+        drawPixel('yellow', x, y)
+        drawScore()
+      }
+      window.onload = function () {
+        state.canvas = document.querySelector('canvas')
+        state.context = state.canvas.getContext('2d')
+        window.onkeydown = function (e) {
+          const direction = direction_map[e.key]
+          console.log(direction)
+          if (direction) {
+            const [x, y] = direction
+            if (-x !== state.direction.x && -y !== state.direction.y) {
+              state.direction.x = x
+              state.direction.y = y
+            }
+          }
+        }
+        tick()
+      }
+      console.log(state.snake)
+    </script>
+  </body>
+</html>
